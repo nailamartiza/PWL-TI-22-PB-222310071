@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rekomendasi Fanfiction</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fff8f0;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #f4d6d6;
+      padding: 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+      color: #5b3e3e;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 30px auto;
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      padding: 30px;
+    }
+
+    label {
+      font-weight: bold;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 15px;
+      resize: none;
+    }
+
+    button {
+      background-color: #d0f0c0;
+      color: #2b4d3d;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #b3e6a1;
+    }
+
+    .result-box {
+      background-color: #fef3e2;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .read-link {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 8px 12px;
+      background-color: #f7c8e0;
+      color: #5a2e3c;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .read-link:hover {
+      background-color: #f3b6d1;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Fanfiction Recommendation</h1>
+  </header>
+
+  <div class="container">
+    <form id="recommendForm">
+      <label for="prompt">Masukkan preferensi cerita (genre, karakter, dll):</label>
+      <textarea id="prompt" name="prompt" placeholder="contoh: aku pengen cerita horor tentang Hyunjin..."></textarea>
+      <button type="submit">Submit</button>
+    </form>
+
+    <div id="results"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById("recommendForm");
+    const results = document.getElementById("results");
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+      const prompt = document.getElementById("prompt").value;
+
+      fetch("/recommend", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ prompt: prompt })
+      })
+      .then(response => response.json())
+      .then(data => {
+        results.innerHTML = "";
+        data.results.forEach(item => {
+          const box = document.createElement("div");
+          box.className = "result-box";
+          box.innerHTML = `
+            <h3>${item.title}</h3>
+            <p><strong>Genre:</strong> ${item.genre}</p>
+            <p><strong>Karakter:</strong> ${item.characters}</p>
+            <a class="read-link" href="${item.link}" target="_blank">🔗 Baca Cerita</a>
+          `;
+          results.appendChild(box);
+        });
+      })
+      .catch(error => {
+        results.innerHTML = "<p>Terjadi kesalahan. Coba lagi nanti.</p>";
+        console.error("Error:", error);
+      });
+    });
+  </script>
+</body>
+</html>
